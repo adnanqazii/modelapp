@@ -51,8 +51,9 @@ def upload():
         class_df=pd.read_csv('./static/class_dict (1).csv')          
         prob=p[index]
         classname=class_df['class'].iloc[index]
+        print(classname,prob)
         return flask.jsonify(classname=classname,prob=str(prob))
     except Exception as err:
         print('error',err)
 # start the flask app, allow remote connections
-app.run(host='0.0.0.0')
+# app.run(host='0.0.0.0')
