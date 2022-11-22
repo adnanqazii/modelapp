@@ -48,7 +48,8 @@ def upload():
         img=np.expand_dims(img, axis=0)
         p= np.squeeze (model.predict(img))
         index=np.argmax(p)  
-        class_df=pd.read_csv('./static/class_dict (1).csv')          
+        my_file = os.path.join(THIS_FOLDER, 'class_dict (1).csv')
+        class_df=pd.read_csv(my_file)          
         prob=p[index]
         classname=class_df['class'].iloc[index]
         print(classname,prob)
