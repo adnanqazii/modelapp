@@ -5,7 +5,7 @@ import cv2 as cv2
 import numpy as np
 import pandas as pd
 from flask import url_for
-
+import os
 app = flask.Flask(__name__)
 # define a predict function as an endpoint 
 print(__name__)
@@ -27,7 +27,9 @@ print(__name__)
     
 #     return 'flask.jsonify(data)'
 
-model=keras.models.load_model('./static/weights-023-0.9998.hdf5')
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+my_file = os.path.join(THIS_FOLDER, 'static/weights-023-0.9998.hdf5')
+model=keras.models.load_model(my_file)
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
