@@ -1,6 +1,6 @@
 # load Flask 
 import flask
-from tensorflow import keras
+# from tensorflow import keras
 import cv2 as cv2
 import numpy as np
 import pandas as pd
@@ -26,17 +26,25 @@ print(__name__)
 #     # return a response in json format 
     
 #     return 'flask.jsonify(data)'
+import keras
+
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-my_file = os.path.join(THIS_FOLDER, 'static/weights-023-0.9998.hdf5')
-model=keras.models.load_model(my_file)
+my_file = os.path.join(THIS_FOLDER, 'static/model_config.json')
+with open(my_file) as json_file:
+    json_config = json_file.read()
+model = keras.models.model_from_json(json_config)
+my_file = os.path.join(THIS_FOLDER, 'static/weights_only.h5')
+
+# Load weights
+model.load_weights(my_file)
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
             #read image file string data
         filestr = flask.request.files['image'].read()
         #convert string data to numpy array
-        file_bytes = np.fromstring(filestr, np.uint8)
+        file_bytes = np.frombuffer(filestr, np.uint8)
         # convert numpy array to image
         img = cv2.imdecode(file_bytes, cv2.IMREAD_REDUCED_COLOR_2)
         img=cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -46,9 +54,9 @@ def upload():
        
         img=cv2.resize(img, img_size)    
         img=np.expand_dims(img, axis=0)
-        p= np.squeeze (model.predict(img))
+        p= np.squeeze (model.predict(img,use_multiprocessing=False,workers=1))
         index=np.argmax(p)  
-        my_file = os.path.join(THIS_FOLDER, 'class_dict (1).csv')
+        my_file = os.path.join(THIS_FOLDER, 'static/class_dict (1).csv')
         class_df=pd.read_csv(my_file)          
         prob=p[index]
         classname=class_df['class'].iloc[index]
@@ -57,4 +65,4 @@ def upload():
     except Exception as err:
         print('error',err)
 # start the flask app, allow remote connections
-# app.run(host='0.0.0.0')
+app.run(host='0.0.0.0')
